@@ -9,7 +9,7 @@
         },
         "frameworks": ["icestorm"],
         "name": "Lattice iCEstick Evaluation Kit",
-        "platform": "latticeice40",
+        "platform": "lattice_ice40",
         "upload": {
             "maximum_ram_size": 32768,
             "maximum_size": 32768
