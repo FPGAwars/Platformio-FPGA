@@ -1,0 +1,20 @@
+{
+    "icestick": {
+        "build": {
+            "core": "hx1K",
+            "f_cpu": "12000000L",
+            "cpu": "ice40",
+            "mcu": "ice40hx1k",
+            "variant": "niidea"
+        },
+        "frameworks": ["icestorm"],
+        "name": "Lattice iCEstick Evaluation Kit",
+        "platform": "lattice_ice40",
+        "upload": {
+            "maximum_ram_size": 32768,
+            "maximum_size": 32768
+        },
+        "url": "http://www.latticesemi.com/icestick",
+        "vendor": "Lattice"
+    }
+}
