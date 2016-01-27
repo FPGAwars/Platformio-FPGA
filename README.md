@@ -8,8 +8,9 @@ This is a **working repo** for testing and developing building scripts, boards a
 
 [The project documentation is located in the wiki](https://github.com/bqlabs/Platformio-FPGA/wiki/Platformio-FPGA-wiki-home)
 
-# Author
-Juan González (Obijuan)
+# Authors
+* Juan González (Obijuan)  
+* Jesús Arroyo
 
 # License
 ![](https://github.com/bqlabs/Platformio-FPGA/raw/master/doc/images/bq-logo-cc-sa-small-150px.png)
