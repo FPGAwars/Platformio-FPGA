@@ -3,7 +3,7 @@ import os
 from platformio.platforms.base import BasePlatform
 
 
-class Latticeice40Platform(BasePlatform):
+class Lattice_ice40Platform(BasePlatform):
     """
     The iCE40 family of ultra-low power, non-volatile FPGAs has five devices with densities
     ranging from 384 to 7680 Look-Up Tables (LUTs). In addition to LUT-based,low-cost programmable
@@ -37,5 +37,5 @@ class Latticeice40Platform(BasePlatform):
         # folder with `test.py`
         return os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
-            "latticeice40-builder.py"
+            "lattice_ice40-builder.py"
         )
