@@ -9,7 +9,7 @@ This is a **working repo** for testing and developing building scripts, boards a
 [The project documentation is located in the wiki](https://github.com/bqlabs/Platformio-FPGA/wiki/Platformio-FPGA-wiki-home)
 
 # Authors
-Juan González (Obijuan)
+Juan González (Obijuan)  
 Jesús Arroyo
 
 # License
