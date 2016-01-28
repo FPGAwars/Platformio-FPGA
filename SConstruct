@@ -3,7 +3,7 @@ from SCons.Script import Environment
 
 # ---------------------- FILES --------------------------
 # -- Boards file
-BOARDF = 'platformio/boards/fpga_boards.json'
+BOARDF = 'platformio/boards/lattice.json'
 
 # -- Platform file
 PLATF = 'platformio/platforms/lattice_ice40.py'

@@ -1,14 +1,16 @@
 {
     "icestick": {
         "build": {
-            "core": "hx1K",
+            "core": "icestick",
             "f_cpu": "12000000L",
-            "cpu": "ice40",
+            "cpu": "fpga",
             "mcu": "ice40hx1k",
-            "variant": "niidea"
+            "variant": "1k",
+            "vid": "0x0403",
+            "pid": "0x6010"
         },
         "frameworks": ["icestorm"],
-        "name": "Lattice iCEstick Evaluation Kit",
+        "name": "Lattice iCEstick FPGA Evaluation Kit",
         "platform": "lattice_ice40",
         "upload": {
             "maximum_ram_size": 32768,
