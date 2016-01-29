@@ -2,14 +2,17 @@
     Build script for lattice ice40 FPGAs
     latticeice40-builder.py
 """
-
+import os
 from os.path import join
-from SCons.Script import AlwaysBuild, Builder, DefaultEnvironment, Glob
+from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment,
+                          Environment, Default, Glob)
 
 env = DefaultEnvironment()
 env.Replace(PROGNAME="hardware")
 
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
+TARGET_SIM = env.subst(TARGET)
+print("------> TARGET: {}".format(TARGET_SIM))
 
 # -- Get all the source files
 src_dir = env.subst('$PROJECTSRC_DIR')
@@ -54,5 +57,24 @@ upload = env.Alias('upload', binf, join(bin_dir, 'iceprog') + ' $SOURCE')
 AlwaysBuild(upload)
 
 # -- Target for calculating the time (.rpt)
-rpt = env.Time(asc)
-t = env.Alias('time', rpt)
+# rpt = env.Time(asc)
+t = env.Alias('time', env.Time('time.rpt', asc))
+
+# -------------------- Simulation ------------------
+# -- Constructor para generar simulacion: icarus Verilog
+iverilog = Builder(action='iverilog $SOURCES -o $TARGET',
+                   suffix='.out',
+                   src_suffix='.v')
+
+vcd = Builder(action='./$SOURCE', suffix='.vcd', src_suffix='.out')
+
+simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
+                     ENV=os.environ)
+
+out = simenv.IVerilog(TARGET_SIM, src_files)
+vcd_file = simenv.VCD(out)
+
+waves = simenv.Alias('sim', TARGET_SIM+'.vcd')
+AlwaysBuild(waves)
+
+Default([binf])
