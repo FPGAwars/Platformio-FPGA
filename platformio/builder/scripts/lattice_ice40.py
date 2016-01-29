@@ -7,7 +7,10 @@ from os.path import join
 from SCons.Script import AlwaysBuild, Builder, DefaultEnvironment, Glob
 
 env = DefaultEnvironment()
-env.Replace(PROGNAME="firmware")
+env.Replace(PROGNAME="hardware")
+
+TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
+print("-------->{}".format(TARGET))
 
 # -- Get all the source files
 src_dir = env.subst('$PROJECTSRC_DIR')
@@ -22,7 +25,7 @@ bin_dir = join('$PIOPACKAGES_DIR', 'toolchain-icestorm', 'bin')
 
 # -- Builder 1 (.v --> .blif)
 synth = Builder(action=join(bin_dir, 'yosys') +
-                ' -p \"synth_ice40 -blif $TARGET\" $SOURCES',
+                ' -p \"synth_ice40 -blif {}.blif\" $SOURCES'.format(TARGET),
                 suffix='.blif',
                 src_suffix='.v')
 
@@ -38,7 +41,7 @@ bitstream = Builder(action=join(bin_dir, 'icepack') + ' $SOURCE $TARGET',
 
 env.Append(BUILDERS={'Synth': synth, 'PnR': pnr, 'Bin': bitstream})
 
-blif = env.Synth(src_files)
+blif = env.Synth(TARGET, src_files)
 asc = env.PnR([blif, PCF[0]])
 binf = env.Bin(asc)
 
