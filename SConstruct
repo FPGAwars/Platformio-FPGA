@@ -9,7 +9,7 @@ BOARDF = 'platformio/boards/lattice.json'
 PLATF = 'platformio/platforms/lattice_ice40.py'
 
 # -- Build file
-BUILDF = 'platformio/platforms/lattice_ice40-builder.py'
+BUILDF = 'platformio/builder/scripts/lattice_ice40.py'
 
 # -- Get the user home directory
 HOME = os.environ['HOME']
@@ -28,7 +28,7 @@ file2 = env.File(PLATF)
 inst2 = env.Install(DEST_DIR+'/platforms/', file2)
 
 file3 = env.File(BUILDF)
-inst3 = env.Install(DEST_DIR+'/platforms/', file3)
+inst3 = env.InstallAs(DEST_DIR+'/platforms/lattice_ice40-builder.py', file3)
 
 
 # -- Install target
