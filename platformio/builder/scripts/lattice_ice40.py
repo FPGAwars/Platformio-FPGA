@@ -3,21 +3,34 @@
     latticeice40-builder.py
 """
 import os
-from os.path import join
+from os.path import join, split
 from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment,
                           Environment, Default, Glob)
 
 env = DefaultEnvironment()
 env.Replace(PROGNAME="hardware")
 
+# -- Target name for synthesis
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
-TARGET_SIM = env.subst(TARGET)
-print("------> TARGET: {}".format(TARGET_SIM))
+
+# -- Target name for simulation
+TARGET_SIM = join(env['PROJECTSRC_DIR'], env['PROGNAME'])  # env.subst(TARGET)
+
+sfiles = Glob(join(env['PROJECTSRC_DIR'], '*.v'))
+l = ["{}".format(f) for f in sfiles]
+rawfiles = [split(f)[1] for f in l]
+print("rawfiles: {}".format(rawfiles))
+pass1 = [f for f in rawfiles if f[-5:].upper() == "_TB.V"]
+testbench = pass1[0]
+src_synth = [join(env['PROJECTSRC_DIR'], f) for f in rawfiles if f != testbench]
+print("Testbench: {}".format(testbench))
+print("Synth files: {}".format(src_synth))
+src_sim = l
 
 # -- Get all the source files
 src_dir = env.subst('$PROJECTSRC_DIR')
-total = join(src_dir, '*.v')
-src_files = Glob(total)
+# total = join(src_dir, '*.v')
+# src_files = Glob(total)
 
 PCFs = join(src_dir, '*.pcf')
 PCF = Glob(PCFs)
@@ -49,7 +62,7 @@ time_rpt = Builder(action='icetime -mtr $TARGET $SOURCE',
 env.Append(BUILDERS={'Synth': synth, 'PnR': pnr, 'Bin': bitstream,
                      'Time': time_rpt})
 
-blif = env.Synth(TARGET, src_files)
+blif = env.Synth(TARGET, src_synth)
 asc = env.PnR([blif, PCF[0]])
 binf = env.Bin(asc)
 
@@ -71,7 +84,7 @@ vcd = Builder(action='./$SOURCE', suffix='.vcd', src_suffix='.out')
 simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
                      ENV=os.environ)
 
-out = simenv.IVerilog(TARGET_SIM, src_files)
+out = simenv.IVerilog(TARGET_SIM, src_sim)
 vcd_file = simenv.VCD(out)
 
 waves = simenv.Alias('sim', TARGET_SIM+'.vcd')
