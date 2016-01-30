@@ -14,24 +14,33 @@ env.Replace(PROGNAME="hardware")
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
 
 # -- Target name for simulation
-TARGET_SIM = join(env['PROJECTSRC_DIR'], env['PROGNAME'])  # env.subst(TARGET)
+TARGET_SIM = join(env['PROJECTSRC_DIR'], env['PROGNAME'])
 
-sfiles = Glob(join(env['PROJECTSRC_DIR'], '*.v'))
-l = ["{}".format(f) for f in sfiles]
-rawfiles = [split(f)[1] for f in l]
-print("rawfiles: {}".format(rawfiles))
-pass1 = [f for f in rawfiles if f[-5:].upper() == "_TB.V"]
-testbench = pass1[0]
-src_synth = [join(env['PROJECTSRC_DIR'], f) for f in rawfiles if f != testbench]
+# -- Get a list of all the verilog files in the src folfer, in ASCII, with
+# -- the full path. All these files are used for the simulation
+v_nodes = Glob(join(env['PROJECTSRC_DIR'], '*.v'))
+src_sim = ["{}".format(f) for f in v_nodes]
+
+# --------- Get the Testbench file (there should be only 1)
+# -- Create a list with all the files finished in _tb.v. It should contain
+# -- the test bench
+list_tb = [f for f in src_sim if f[-5:].upper() == "_TB.V"]
+
+# -- TODO: error checking
+testbench = list_tb[0]
+
+# -------- Get the synthesis files.  They are ALL the files except the
+# -------- testbench
+src_synth = [f for f in src_sim if f != testbench]
+
+# -- For debugging
 print("Testbench: {}".format(testbench))
 print("Synth files: {}".format(src_synth))
-src_sim = l
+print("Sim files: {}".format(src_sim))
+print("")
 
-# -- Get all the source files
+# -- Get the PCF file
 src_dir = env.subst('$PROJECTSRC_DIR')
-# total = join(src_dir, '*.v')
-# src_files = Glob(total)
-
 PCFs = join(src_dir, '*.pcf')
 PCF = Glob(PCFs)
 
