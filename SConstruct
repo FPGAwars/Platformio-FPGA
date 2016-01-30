@@ -1,34 +1,36 @@
 import os
+from os.path import join
 from SCons.Script import Environment
 
 # ---------------------- FILES --------------------------
 # -- Boards file
-BOARDF = 'platformio/boards/lattice.json'
+BOARDF = join('platformio', 'boards', 'lattice.json')
 
 # -- Platform file
-PLATF = 'platformio/platforms/lattice_ice40.py'
+PLATF = join('platformio', 'platforms', 'lattice_ice40.py')
 
 # -- Build file
-BUILDF = 'platformio/builder/scripts/lattice_ice40.py'
+BUILDF = join('platformio', 'builder', 'scripts', 'lattice_ice40.py')
 
 # -- Get the user home directory
 HOME = os.environ['HOME']
 
 # -- Platformio home user dir
-DEST_DIR = HOME + '/.platformio/'
+DEST_DIR = join(HOME, '.platformio')
 
 # -- Create the building environment
 env = Environment()
 
 # -- Installing files
 file1 = env.File(BOARDF)
-inst1 = env.Install(DEST_DIR+'/boards/', file1)
+inst1 = env.Install(join(DEST_DIR, 'boards'), file1)
 
 file2 = env.File(PLATF)
-inst2 = env.Install(DEST_DIR+'/platforms/', file2)
+inst2 = env.Install(join(DEST_DIR, 'platforms'), file2)
 
 file3 = env.File(BUILDF)
-inst3 = env.InstallAs(DEST_DIR+'/platforms/lattice_ice40-builder.py', file3)
+inst3 = env.InstallAs(join(DEST_DIR, 'platforms', 'lattice_ice40-builder.py'),
+                      file3)
 
 
 # -- Install target
