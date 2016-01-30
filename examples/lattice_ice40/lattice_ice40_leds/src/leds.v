@@ -6,9 +6,9 @@ module leds(output wire D1,
             output wire D5);
 
 //-- icestick Red leds
-assign D1 = 0'b1;
+assign D1 = 1'b1;
 assign D2 = 1'b1;
-assign D3 = 0'b1;
+assign D3 = 1'b1;
 assign D4 = 1'b1;
 
 //-- Green led
