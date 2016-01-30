@@ -1,25 +1,25 @@
-module contador #(
-        parameter N = 28  //-- Numero de bits del contador
+module counter #(
+        parameter N = 29          //-- Counter bits lentgh
   )(
-        input wire clk,           //-- Reloj del sistema
-        output wire [4:0] leds    //-- Leds de la icestick
+        input wire clk,
+        output wire [4:0] leds
 );
 
 reg [N-1:0] cont;
 reg rstn = 0;
 
-//-- Inicialización
+//-- Initialization
 always @(posedge clk)
   rstn <= 1;
 
-//-- Contador, con reset síncrono
+//-- counter, with synchronous reset
 always @(posedge clk)
   if (!rstn)
     cont <= 0;
   else
     cont <= cont + 1;
 
-//-- Conectar los 5 bits más significativos del contador a los leds
+//-- Connect the 5 most significant bits to the leds
 assign leds = cont[N-1: N-6];
 
 endmodule

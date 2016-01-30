@@ -1,9 +1,9 @@
 `timescale 100 ns / 10 ns
 `default_nettype none
 
-module contador_tb;
+module counter_tb;
 
-localparam N = 6;  //-- Numero de bits del contador
+localparam N = 6;  //-- Counter bits length
 
 reg clk = 0;
 
@@ -13,7 +13,7 @@ wire [4:0] leds;
 always
   # 0.5 clk <= ~clk;
 
-  contador #(
+  counter #(
              .N(N)
   )  CONT0 (
              .clk(clk),
@@ -23,8 +23,8 @@ always
 initial begin
 
       //-- File where to store the simulation
-      $dumpfile("contador_tb.vcd");
-      $dumpvars(0, contador_tb);
+      $dumpfile("counter_tb.vcd");
+      $dumpvars(0, counter_tb);
 
       #200 $display("END of the simulation");
       $finish;
