@@ -115,7 +115,9 @@ out = simenv.IVerilog(TARGET_SIM, src_sim)
 vcd_file = simenv.VCD(TARGET_SIM, out)
 
 waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave ' +
-                     join(env['PROJECT_DIR'], "{}".format(vcd_file[0])))
+                     join(env['PROJECT_DIR'], "{} ".format(vcd_file[0])) +
+                     join(env['PROJECTSRC_DIR'], env['SIMULNAME']) +
+                     '.gtkw')
 AlwaysBuild(waves)
 
 Default([binf])
