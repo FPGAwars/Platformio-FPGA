@@ -3,12 +3,21 @@
     latticeice40-builder.py
 """
 import os
-from os.path import join, split
+from os.path import join
 from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment,
                           Environment, Default, Glob)
 
 env = DefaultEnvironment()
 env.Replace(PROGNAME="hardware")
+
+# -- Get the local folder in which the icestorm tools should be installed
+piopackages_dir = env.subst('$PIOPACKAGES_DIR')
+bin_dir = join(piopackages_dir, 'toolchain-icestorm', 'bin')
+
+# -- Add this path to the PATH env variable. First the building tools will be
+# -- searched in the local PATH. If they are not founde, the global ones will
+# -- be executed (if installed)
+env.PrependENVPath('PATH', bin_dir)
 
 # -- Target name for synthesis
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
@@ -26,9 +35,11 @@ src_sim = ["{}".format(f) for f in v_nodes]
 # -- the test bench
 list_tb = [f for f in src_sim if f[-5:].upper() == "_TB.V"]
 
-# -- TODO: error checking
+# -- Error checking
 try:
     testbench = list_tb[0]
+
+# -- there is no testbench
 except IndexError:
     testbench = None
 
@@ -42,23 +53,24 @@ print("Testbench: {}".format(testbench))
 print("Synth files: {}".format(src_synth))
 print("Sim files: {}".format(src_sim))
 print("")
+# print("ENV: {}".format(env['ENV']))
 
 # -- Get the PCF file
 src_dir = env.subst('$PROJECTSRC_DIR')
 PCFs = join(src_dir, '*.pcf')
 PCF = Glob(PCFs)
 
-bin_dir = join('$PIOPACKAGES_DIR', 'toolchain-icestorm', 'bin')
+# synth = Builder(action=join(bin_dir, 'yosys') +
 
 # -- Builder 1 (.v --> .blif)
-synth = Builder(action=join(bin_dir, 'yosys') +
-                ' -p \"synth_ice40 -blif {}.blif\" $SOURCES'.format(TARGET),
+synth = Builder(action='yosys -p \"synth_ice40 -blif {}.blif\" \
+                        $SOURCES'.format(TARGET),
                 suffix='.blif',
                 src_suffix='.v')
 
 # -- Builder 2 (.blif --> .asc)
-pnr = Builder(action=join(bin_dir, 'arachne-pnr') +
-              ' -d 1k -o $TARGET -p {} $SOURCE'.format(PCF[0]),
+pnr = Builder(action='arachne-pnr -d 1k -o $TARGET -p {} \
+                      $SOURCE'.format(PCF[0]),
               suffix='.asc',
               src_suffix='.blif')
 
