@@ -9,6 +9,7 @@ from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment,
 
 env = DefaultEnvironment()
 env.Replace(PROGNAME="hardware")
+env.Append(SIMULNAME="simulation")
 
 # -- Get the local folder in which the icestorm tools should be installed
 piopackages_dir = env.subst('$PIOPACKAGES_DIR')
@@ -23,7 +24,7 @@ env.PrependENVPath('PATH', bin_dir)
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
 
 # -- Target name for simulation
-TARGET_SIM = join(env['PROJECTSRC_DIR'], env['PROGNAME'])
+TARGET_SIM = join(env['PROJECT_DIR'], env['SIMULNAME'])
 
 # -- Get a list of all the verilog files in the src folfer, in ASCII, with
 # -- the full path. All these files are used for the simulation
@@ -75,7 +76,7 @@ pnr = Builder(action='arachne-pnr -d 1k -o $TARGET -p {} \
               src_suffix='.blif')
 
 # -- Builder 3 (.asc --> .bin)
-bitstream = Builder(action=join(bin_dir, 'icepack') + ' $SOURCE $TARGET',
+bitstream = Builder(action='icepack $SOURCE $TARGET',
                     suffix='.bin',
                     src_suffix='.asc')
 
@@ -104,7 +105,8 @@ iverilog = Builder(action='iverilog $SOURCES -o $TARGET',
                    suffix='.out',
                    src_suffix='.v')
 
-vcd = Builder(action='./$SOURCE', suffix='.vcd', src_suffix='.out')
+vcd = Builder(action='./$SOURCE',
+              suffix='.vcd', src_suffix='.out')
 
 simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
                      ENV=os.environ)
@@ -112,7 +114,7 @@ simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
 out = simenv.IVerilog(TARGET_SIM, src_sim)
 vcd_file = simenv.VCD(out)
 
-waves = simenv.Alias('sim', TARGET_SIM+'.vcd')
+waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave $SOURCE')
 AlwaysBuild(waves)
 
 Default([binf])
