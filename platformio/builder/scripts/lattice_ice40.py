@@ -105,16 +105,19 @@ iverilog = Builder(action='iverilog $SOURCES -o $TARGET',
                    suffix='.out',
                    src_suffix='.v')
 
-vcd = Builder(action='./$SOURCE',
+vcd = Builder(action=join(env['PROJECT_DIR'], '$SOURCE'),
               suffix='.vcd', src_suffix='.out')
 
 simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
                      ENV=os.environ)
 
 out = simenv.IVerilog(TARGET_SIM, src_sim)
-vcd_file = simenv.VCD(out)
+vcd_file = simenv.VCD(TARGET_SIM, out)
 
-waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave $SOURCE')
+waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave ' +
+                     join(env['PROJECT_DIR'], "{} ".format(vcd_file[0])) +
+                     join(env['PROJECTSRC_DIR'], env['SIMULNAME']) +
+                     '.gtkw')
 AlwaysBuild(waves)
 
 Default([binf])
