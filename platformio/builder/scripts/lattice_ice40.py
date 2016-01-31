@@ -27,7 +27,11 @@ src_sim = ["{}".format(f) for f in v_nodes]
 list_tb = [f for f in src_sim if f[-5:].upper() == "_TB.V"]
 
 # -- TODO: error checking
-testbench = list_tb[0]
+try:
+    testbench = list_tb[0]
+except IndexError:
+    testbench = None
+
 
 # -------- Get the synthesis files.  They are ALL the files except the
 # -------- testbench
