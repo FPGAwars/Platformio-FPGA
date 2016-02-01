@@ -51,15 +51,22 @@ src_synth = [f for f in src_sim if f != testbench]
 
 # -- For debugging
 print("Testbench: {}".format(testbench))
-print("Synth files: {}".format(src_synth))
-print("Sim files: {}".format(src_sim))
-print("")
+# print("Synth files: {}".format(src_synth))
+# print("Sim files: {}".format(src_sim))
+# print("")
 # print("ENV: {}".format(env['ENV']))
 
 # -- Get the PCF file
 src_dir = env.subst('$PROJECTSRC_DIR')
 PCFs = join(src_dir, '*.pcf')
-PCF = Glob(PCFs)
+PCF_list = Glob(PCFs)
+
+try:
+    PCF = PCF_list[0]
+except IndexError:
+    print("\n--------> WARNING: no .pcf file found <----------\n")
+    PCF = 'ERROR.pcf'
+
 
 # synth = Builder(action=join(bin_dir, 'yosys') +
 
@@ -71,7 +78,7 @@ synth = Builder(action='yosys -p \"synth_ice40 -blif {}.blif\" \
 
 # -- Builder 2 (.blif --> .asc)
 pnr = Builder(action='arachne-pnr -d 1k -o $TARGET -p {} \
-                      $SOURCE'.format(PCF[0]),
+                      $SOURCE'.format(PCF),
               suffix='.asc',
               src_suffix='.blif')
 
@@ -88,9 +95,9 @@ time_rpt = Builder(action='icetime -mtr $TARGET $SOURCE',
 env.Append(BUILDERS={'Synth': synth, 'PnR': pnr, 'Bin': bitstream,
                      'Time': time_rpt})
 
-blif = env.Synth(TARGET, src_synth)
-asc = env.PnR([blif, PCF[0]])
-binf = env.Bin(asc)
+blif = env.Synth(TARGET, [src_synth])
+asc = env.PnR(TARGET, [blif, PCF])
+binf = env.Bin(TARGET, asc)
 
 upload = env.Alias('upload', binf, join(bin_dir, 'iceprog') + ' $SOURCE')
 AlwaysBuild(upload)
