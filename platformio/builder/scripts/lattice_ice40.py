@@ -99,7 +99,7 @@ blif = env.Synth(TARGET, [src_synth])
 asc = env.PnR(TARGET, [blif, PCF])
 binf = env.Bin(TARGET, asc)
 
-upload = env.Alias('upload', binf, join(bin_dir, 'iceprog') + ' $SOURCE')
+upload = env.Alias('upload', binf, 'iceprog ' + ' $SOURCE')
 AlwaysBuild(upload)
 
 # -- Target for calculating the time (.rpt)
