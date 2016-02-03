@@ -10,7 +10,7 @@ TCDIR=$PWD/toolchain-icestorm
 
 # Go to code directory
 if [ -z "$1" ]; then
-    echo "Add your code directory. Ex: ., .., ~/code"
+    echo "Add your code directory. Ex: ., .., ~/code [clean]"
     exit 1
 fi
 cd $1
@@ -20,24 +20,42 @@ sudo apt-get install build-essential clang bison flex libreadline-dev \
                      gawk tcl-dev libffi-dev git mercurial graphviz   \
                      xdot pkg-config python python3 libftdi-dev
 
-# Instal Icestorm
+# Install Icestorm
 git -C icestorm pull || git clone https://github.com/cliffordwolf/icestorm.git icestorm
 cd icestorm
+if [ "$2" == "clean" ]; then
+    make clean
+fi
 make -j$nproc
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 make install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
 # Install Arachne-PNR
 git -C arachne-pnr pull || git clone https://github.com/cseed/arachne-pnr.git arachne-pnr
 cd arachne-pnr
+if [ "$2" == "clean" ]; then
+    make clean
+fi
 make -j$nproc
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 make install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
 # Install Yosys
 git -C yosys pull || git clone https://github.com/cliffordwolf/yosys.git yosys
 cd yosys
+if [ "$2" == "clean" ]; then
+    make clean
+fi
 make -j$nproc
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 make install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
