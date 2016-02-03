@@ -23,7 +23,7 @@ class Lattice_ice40Platform(BasePlatform):
 
             # Flag which allows PlatformIO to install this package by
             # default via `> platformio install test` command
-            "default": False
+            "default": True
         },
     }
 
