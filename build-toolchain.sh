@@ -27,10 +27,7 @@ if [ "$2" == "clean" ]; then
     make clean
 fi
 make -j$nproc
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-make install DESTDIR=$TCDIR PREFIX=""
+make  install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
 # Install Arachne-PNR
@@ -40,10 +37,7 @@ if [ "$2" == "clean" ]; then
     make clean
 fi
 make -j$nproc
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-make install DESTDIR=$TCDIR PREFIX=""
+make install DESTDIR=$TCDIR PREFIX="" ICEBOX="$TCDIR/share/icebox"
 cd ..
 
 # Install Yosys
@@ -52,10 +46,7 @@ cd yosys
 if [ "$2" == "clean" ]; then
     make clean
 fi
-make -j$nproc
-if [ $? -ne 0 ]; then
-    exit 1
-fi
+make -j$nproc || exit 1
 make install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
