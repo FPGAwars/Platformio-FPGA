@@ -6,8 +6,8 @@ CONFIG := clang
 # CONFIG := mxe
 
 # features (the more the better)
-ENABLE_TCL := 1
-ENABLE_ABC := 1
+ENABLE_TCL := 0
+ENABLE_ABC := 0
 ENABLE_PLUGINS := 0
 ENABLE_READLINE := 0
 ENABLE_VERIFIC := 0
@@ -49,7 +49,7 @@ VPATH := $(YOSYS_SRC)
 
 CXXFLAGS += -Wall -Wextra -I. -I"$(YOSYS_SRC)" -MD -D_YOSYS_ -fPIC -I$(DESTDIR)$(PREFIX)/include
 LDFLAGS += -L$(DESTDIR)$(PREFIX)/lib
-LDLIBS = -static-libstdc++  -static-libgcc -lm -lrt -ldl /usr/lib/x86_64-linux-gnu/libtcl8.6.a -lpthread /usr/lib/x86_64-linux-gnu/libz.a
+LDLIBS =  -static-libstdc++  -static-libgcc -lm
 SED = sed
 BISON = bison
 
@@ -65,7 +65,7 @@ ifeq (Darwin,$(findstring Darwin,$(shell uname)))
 	SED = sed
 else
 	LDFLAGS += -rdynamic
-	#LDLIBS += -lrt
+	LDLIBS += -lrt
 endif
 
 YOSYS_VER := 0.5+$(shell cd $(YOSYS_SRC) && test -d .git && { git log --author=clifford@clifford.at --oneline c3c9fbfb8c678.. | wc -l; })
@@ -160,7 +160,7 @@ LD = /usr/local/src/mxe/usr/bin/i686-pc-mingw32-gcc
 CXXFLAGS += -std=gnu++0x -Os -D_POSIX_SOURCE
 CXXFLAGS := $(filter-out -fPIC,$(CXXFLAGS))
 LDFLAGS := $(filter-out -rdynamic,$(LDFLAGS)) -s
-#LDLIBS := $(filter-out -lrt,$(LDLIBS))
+LDLIBS := $(filter-out -lrt,$(LDLIBS))
 ABCMKARGS += ARCHFLAGS="-DSIZEOF_VOID_P=4 -DSIZEOF_LONG=4 -DSIZEOF_INT=4 -DWIN32_NO_DLL -x c++ -fpermissive -w"
 ABCMKARGS += LIBS="lib/x86/pthreadVC2.lib -s" READLINE=0 CC="$(CXX)" CXX="$(CXX)"
 EXE = .exe
@@ -175,22 +175,22 @@ endif
 
 ifeq ($(ENABLE_READLINE),1)
 CXXFLAGS += -DYOSYS_ENABLE_READLINE
-#LDLIBS += -lreadline
+LDLIBS += -lreadline
 ifeq ($(CONFIG),mxe)
-#LDLIBS += -lpdcurses
+LDLIBS += -lpdcurses
 endif
 endif
 
 ifeq ($(ENABLE_PLUGINS),1)
 CXXFLAGS += -DYOSYS_ENABLE_PLUGINS $(shell pkg-config --silence-errors --cflags libffi)
-#LDLIBS += $(shell pkg-config --silence-errors --libs libffi || echo -lffi) -ldl
+LDLIBS += $(shell pkg-config --silence-errors --libs libffi || echo -lffi) -ldl
 endif
 
 ifeq ($(ENABLE_TCL),1)
 TCL_VERSION ?= tcl$(shell echo 'puts [info tclversion]' | tclsh)
 TCL_INCLUDE ?= /usr/include/$(TCL_VERSION)
 CXXFLAGS += -I$(TCL_INCLUDE) -DYOSYS_ENABLE_TCL
-#LDLIBS += -l$(TCL_VERSION)
+LDLIBS += -l$(TCL_VERSION)
 endif
 
 ifeq ($(ENABLE_GPROF),1)
@@ -211,7 +211,7 @@ ifeq ($(ENABLE_VERIFIC),1)
 VERIFIC_DIR ?= /usr/local/src/verific_lib_eval
 VERIFIC_COMPONENTS ?= verilog vhdl database util containers sdf
 CXXFLAGS += $(patsubst %,-I$(VERIFIC_DIR)/%,$(VERIFIC_COMPONENTS)) -DYOSYS_ENABLE_VERIFIC
-#LDLIBS += $(patsubst %,$(VERIFIC_DIR)/%/*-linux.a,$(VERIFIC_COMPONENTS))
+LDLIBS += $(patsubst %,$(VERIFIC_DIR)/%/*-linux.a,$(VERIFIC_COMPONENTS))
 endif
 
 ifeq ($(ENABLE_COVER),1)
