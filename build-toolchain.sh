@@ -12,7 +12,6 @@ VERSION=2
 PACKNAME=$NAME-$ARCH-$VERSION
 TARBALL=$PACKNAME.tar.gz
 TCDIR=$PWD/$NAME
-TCDIR=$PWD/toolchain-icestorm
 
 # Go to code directory
 if [ -z "$1" ]; then
@@ -37,7 +36,7 @@ cd icestorm
 if [ "$2" == "clean" ]; then
     make clean
 fi
-make -j$nproc LIBS='-static -static-libstdc++  -static-libgcc -lm'
+make -j$nproc
 make  install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
@@ -47,7 +46,7 @@ cd arachne-pnr
 if [ "$2" == "clean" ]; then
     make clean
 fi
-make -j$nproc
+make -j$nproc LIBS='-static -static-libstdc++  -static-libgcc -lm'
 make install DESTDIR=$TCDIR PREFIX="" ICEBOX="$TCDIR/share/icebox"
 cd ..
 
