@@ -7,7 +7,7 @@ CONFIG := clang
 
 # features (the more the better)
 ENABLE_TCL := 0
-ENABLE_ABC := 0
+ENABLE_ABC := 1
 ENABLE_PLUGINS := 0
 ENABLE_READLINE := 0
 ENABLE_VERIFIC := 0
