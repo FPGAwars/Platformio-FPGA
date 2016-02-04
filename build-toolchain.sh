@@ -6,6 +6,12 @@
 # sources: http://www.clifford.at/icestorm/
 # This tarball can be unpacked in ~/.platformio/packages
 
+NAME=toolchain-icestorm
+ARCH=x86_64
+VERSION=2
+PACKNAME=$NAME-$ARCH-$VERSION
+TARBALL=$PACKNAME.tar.gz
+TCDIR=$PWD/$NAME
 TCDIR=$PWD/toolchain-icestorm
 
 # Go to code directory
@@ -13,6 +19,11 @@ if [ -z "$1" ]; then
     echo "Add your code directory. Ex: ., .., ~/code [clean]"
     exit 1
 fi
+
+# Store current dir
+WORK=$PWD
+
+# -- Enter into the code directory
 cd $1
 
 # Install dependencies
@@ -26,7 +37,7 @@ cd icestorm
 if [ "$2" == "clean" ]; then
     make clean
 fi
-make -j$nproc
+make -j$nproc LIBS='-static -static-libstdc++  -static-libgcc -lm'
 make  install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
@@ -51,7 +62,8 @@ make install DESTDIR=$TCDIR PREFIX=""
 cd ..
 
 # Package tarball
-tar -czvf $TCDIR.tar.gz $TCDIR
+cd $WORK
+tar -czvf $TARBALL $NAME
 
 # Install toolchain into local
 cp -r $TCDIR $HOME/.platformio/packages/
