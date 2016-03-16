@@ -59,7 +59,8 @@ if 'sim' in COMMAND_LINE_TARGETS:
 else:
     SIMULNAME = ''
 
-TARGET_SIM = join(env['PROJECT_DIR'], SIMULNAME)
+
+TARGET_SIM = join(env.subst('$BUILD_DIR'), SIMULNAME)
 
 # -------- Get the synthesis files.  They are ALL the files except the
 # -------- testbench
@@ -124,16 +125,16 @@ iverilog = Builder(action='iverilog $SOURCES -o $TARGET',
                    suffix='.out',
                    src_suffix='.v')
 
-vcd = Builder(action=join(env['PROJECT_DIR'], '$SOURCE'),
+vcd = Builder(action=' $SOURCE',
               suffix='.vcd', src_suffix='.out')
 
 simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
                      ENV=os.environ)
 
-out = simenv.IVerilog(SIMULNAME, src_sim)
+out = simenv.IVerilog(TARGET_SIM, src_sim)
 vcd_file = simenv.VCD(SIMULNAME, out)
 
-waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave ' +
+waves = simenv.Alias('sim', vcd_file, 'gtkwave ' +
                      join(env['PROJECT_DIR'], "{} ".format(vcd_file[0])) +
                      join(env['PROJECTSRC_DIR'], SIMULNAME) +
                      '.gtkw')
@@ -143,4 +144,5 @@ Default([binf])
 
 # -- These is for cleaning the files generated using the alias targets
 if GetOption('clean'):
-    env.Default([out, t, vcd_file])
+    env.Default([t])
+    simenv.Default([out, vcd_file])
