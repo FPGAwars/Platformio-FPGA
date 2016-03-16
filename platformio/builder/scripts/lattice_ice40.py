@@ -4,8 +4,9 @@
 """
 import os
 from os.path import join
-from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment,
-                          Environment, Default, Glob)
+from SCons.Script import (AlwaysBuild, Builder, DefaultEnvironment, Exit,
+                          Environment, Default, Glob, COMMAND_LINE_TARGETS,
+                          GetOption)
 
 env = DefaultEnvironment()
 env.Replace(PROGNAME="hardware")
@@ -24,7 +25,7 @@ env.PrependENVPath('PATH', bin_dir)
 TARGET = join(env['BUILD_DIR'], env['PROGNAME'])
 
 # -- Target name for simulation
-TARGET_SIM = join(env['PROJECT_DIR'], env['SIMULNAME'])
+# TARGET_SIM = join(env['PROJECT_DIR'], env['SIMULNAME'])
 
 # -- Get a list of all the verilog files in the src folfer, in ASCII, with
 # -- the full path. All these files are used for the simulation
@@ -36,6 +37,9 @@ src_sim = ["{}".format(f) for f in v_nodes]
 # -- the test bench
 list_tb = [f for f in src_sim if f[-5:].upper() == "_TB.V"]
 
+if len(list_tb) > 1:
+    print("---> WARNING: More than one testbenches used")
+
 # -- Error checking
 try:
     testbench = list_tb[0]
@@ -44,17 +48,25 @@ try:
 except IndexError:
     testbench = None
 
+if 'sim' in COMMAND_LINE_TARGETS:
+    if testbench is None:
+        print("ERROR!!! NO testbench found for simulation")
+        Exit(1)
+
+    # -- Simulation name
+    testbench_file = os.path.split(testbench)[-1]
+    SIMULNAME, ext = os.path.splitext(testbench_file)
+else:
+    SIMULNAME = ''
+
+TARGET_SIM = join(env['PROJECT_DIR'], SIMULNAME)
 
 # -------- Get the synthesis files.  They are ALL the files except the
 # -------- testbench
-src_synth = [f for f in src_sim if f != testbench]
+src_synth = [f for f in src_sim if f not in list_tb]
 
 # -- For debugging
 print("Testbench: {}".format(testbench))
-# print("Synth files: {}".format(src_synth))
-# print("Sim files: {}".format(src_sim))
-# print("")
-# print("ENV: {}".format(env['ENV']))
 
 # -- Get the PCF file
 src_dir = env.subst('$PROJECTSRC_DIR')
@@ -64,11 +76,11 @@ PCF_list = Glob(PCFs)
 try:
     PCF = PCF_list[0]
 except IndexError:
-    print("\n--------> WARNING: no .pcf file found <----------\n")
-    PCF = 'ERROR.pcf'
+    print("\n--------> ERROR: no .pcf file found <----------\n")
+    Exit(2)
 
-
-# synth = Builder(action=join(bin_dir, 'yosys') +
+# -- Debug
+print("----> PCF Found: {}".format(PCF))
 
 # -- Builder 1 (.v --> .blif)
 synth = Builder(action='yosys -p \"synth_ice40 -blif {}.blif\" \
@@ -118,13 +130,17 @@ vcd = Builder(action=join(env['PROJECT_DIR'], '$SOURCE'),
 simenv = Environment(BUILDERS={'IVerilog': iverilog, 'VCD': vcd},
                      ENV=os.environ)
 
-out = simenv.IVerilog(TARGET_SIM, src_sim)
-vcd_file = simenv.VCD(TARGET_SIM, out)
+out = simenv.IVerilog(SIMULNAME, src_sim)
+vcd_file = simenv.VCD(SIMULNAME, out)
 
 waves = simenv.Alias('sim', TARGET_SIM+'.vcd', 'gtkwave ' +
                      join(env['PROJECT_DIR'], "{} ".format(vcd_file[0])) +
-                     join(env['PROJECTSRC_DIR'], env['SIMULNAME']) +
+                     join(env['PROJECTSRC_DIR'], SIMULNAME) +
                      '.gtkw')
 AlwaysBuild(waves)
 
 Default([binf])
+
+# -- These is for cleaning the files generated using the alias targets
+if GetOption('clean'):
+    env.Default([out, t, vcd_file])
