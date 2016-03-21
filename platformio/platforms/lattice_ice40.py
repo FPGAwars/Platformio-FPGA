@@ -27,9 +27,4 @@ class Lattice_ice40Platform(BasePlatform):
         },
     }
 
-    def get_build_script(self):
-        """ Returns a path to build script """
-        return os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            "lattice_ice40-builder.py"
-        )
+    
