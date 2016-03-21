@@ -1,5 +1,6 @@
 import os
 from os.path import join
+from os.path import expanduser
 from SCons.Script import Environment
 
 # ---------------------- FILES --------------------------
@@ -13,7 +14,7 @@ PLATF = join('platformio', 'platforms', 'lattice_ice40.py')
 BUILDF = join('platformio', 'builder', 'scripts', 'lattice_ice40.py')
 
 # -- Get the user home directory
-HOME = os.environ['HOME']
+HOME = expanduser("~")
 
 # -- Platformio home user dir
 DEST_DIR = join(HOME, '.platformio')
