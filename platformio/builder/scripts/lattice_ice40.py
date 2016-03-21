@@ -121,7 +121,7 @@ t = env.Alias('time', env.Time('time.rpt', asc))
 
 # -------------------- Simulation ------------------
 # -- Constructor para generar simulacion: icarus Verilog
-iverilog = Builder(action='iverilog $SOURCES -o $TARGET',
+iverilog = Builder(action='iverilog -o $TARGET $SOURCES ',
                    suffix='.out',
                    src_suffix='.v')
 
