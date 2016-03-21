@@ -23,7 +23,7 @@ always
 initial begin
 
       //-- File where to store the simulation
-      $dumpfile("simulation.vcd");
+      $dumpfile("counter_tb.vcd");
       $dumpvars(0, counter_tb);
 
       #200 $display("END of the simulation");
