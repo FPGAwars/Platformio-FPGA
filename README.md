@@ -13,6 +13,6 @@ This is a **working repo** for testing and developing building scripts, boards a
 * Jesús Arroyo
 
 # License
-![](https://github.com/bqlabs/Platformio-FPGA/raw/master/doc/images/bq-logo-150px.png)
+![](https://github.com/FPGAwars/Platformio-FPGA/raw/master/doc/images/bq-logo-150px.png)
 
 Licensed under the permissive Apache 2.0 licence, the same than platformio
